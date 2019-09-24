@@ -6,17 +6,27 @@ struct VSliderDemo: View {
     var body: some View {
         VStack {
             HStack {
-                VStack{
-                    Picker(selection: $model.selectedRange, label: Text("Range")) {
-                    Text("0...1").tag(0)
-                    Text("-3...17").tag(1)
-                }
-                .pickerStyle(SegmentedPickerStyle())
-                    Picker(selection: $model.selectedStep, label: Text("Step")) {
-                    Text("None").tag(0)
-                    Text("5").tag(1)
-                }
-                    .pickerStyle(SegmentedPickerStyle())
+                GeometryReader { geometry in
+                    VStack{
+                        HStack {
+                            Text("Range")
+                                .frame(width: geometry.size.width * 0.4)
+                            Picker(selection: self.$model.selectedRange, label: Text("Range")) {
+                                Text("0...1").tag(0)
+                                Text("-3...17").tag(1)
+                            }
+                            .pickerStyle(SegmentedPickerStyle())
+                        }
+                        HStack {
+                            Text("Step")
+                                .frame(width: geometry.size.width * 0.4)
+                            Picker("Step", selection: self.$model.selectedStep) {
+                                Text("None").tag(0)
+                                Text("5").tag(1)
+                            }
+                            .pickerStyle(SegmentedPickerStyle())
+                        }
+                    }
                 }
                 VStack {
                     Text(String(format: "%2.2f", model.sliderValue as Double))
@@ -32,14 +42,24 @@ struct VSliderDemo: View {
                    in: model.initialRange,
                    step: model.initialStep ?? 0.0001,
                    onEditingChanged: { print($0 ? "Moving Slider" : "Stopped moving Slider") })
+
             Spacer()
-        }.padding([.leading, .trailing])
+
+            HStack {
+                ForEach(model.levels.indices, id: \.self) { index in
+                    VStack {
+                        Text(String(format: "%1.1f", self.model.levels[index] as Double))
+                            .font(Font.body.monospacedDigit())
+                        VSlider(value: self.$model.levels[index], in: 0...11)
+                    }
+                }
+            }
+
+        }.padding()
     }
 }
 
 class VSliderDemoModel: ObservableObject {
-    private var lock = false
-
     @Published var sliderValue: Double = 0
     @Published var selectedRange: Int = 0 {
         willSet {
@@ -56,6 +76,7 @@ class VSliderDemoModel: ObservableObject {
             }
         }
     }
+    @Published var levels: [Double] = Array(repeating: 0, count: 6)
 
     var initialRange: ClosedRange<Double> {
         if selectedRange == 0 {

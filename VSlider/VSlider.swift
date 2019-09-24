@@ -6,15 +6,11 @@ struct VSlider: View {
     var step: Double.Stride? = nil
     var onEditingChanged: (Bool) -> Void = { _ in }
 
-    private let drawRadius: CGFloat = 14
+    private let drawRadius: CGFloat = 13
     private let dragRadius: CGFloat = 25
     private let lineWidth: CGFloat = 3
 
     @State private var validDrag = false
-
-    init(value: Binding<Double>) {
-        self.value = value
-    }
 
     init(value: Binding<Double>, in range: ClosedRange<Double> = 0...1, step: Double.Stride? = nil, onEditingChanged: @escaping (Bool) -> Void = { _ in }) {
         self.value = value
@@ -56,7 +52,7 @@ struct VSlider: View {
                     .frame(width: 2 * self.drawRadius, height: 2 * self.drawRadius)
                     .position(self.getPoint(in: geometry))
                     .foregroundColor(Color.white)
-                    .shadow(radius: 3)
+                    .shadow(radius: 2, y: 2)
 
                 // Catches drag gesture
                 Rectangle()
