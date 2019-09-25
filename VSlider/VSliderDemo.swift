@@ -48,7 +48,7 @@ struct VSliderDemo: View {
             HStack {
                 ForEach(model.levels.indices, id: \.self) { index in
                     VStack {
-                        Text(String(format: "%1.1f", self.model.levels[index] as Double))
+                        Text(String(format: "%1.1f", self.model.levels[index] as Float))
                             .font(Font.body.monospacedDigit())
                         VSlider(value: self.$model.levels[index], in: 0...11)
                     }
@@ -76,7 +76,7 @@ class VSliderDemoModel: ObservableObject {
             }
         }
     }
-    @Published var levels: [Double] = Array(repeating: 0, count: 6)
+    @Published var levels: [Float] = Array(repeating: 0, count: 6)
 
     var initialRange: ClosedRange<Double> {
         if selectedRange == 0 {

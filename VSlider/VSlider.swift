@@ -1,9 +1,9 @@
 import SwiftUI
 
-struct VSlider: View {
-    var value: Binding<Double>
-    var range: ClosedRange<Double> = 0...1
-    var step: Double.Stride? = nil
+struct VSlider<V: BinaryFloatingPoint>: View {
+    var value: Binding<V>
+    var range: ClosedRange<V> = 0...1
+    var step: V.Stride? = nil
     var onEditingChanged: (Bool) -> Void = { _ in }
 
     private let drawRadius: CGFloat = 13
@@ -12,14 +12,14 @@ struct VSlider: View {
 
     @State private var validDrag = false
 
-    init(value: Binding<Double>, in range: ClosedRange<Double> = 0...1, step: Double.Stride? = nil, onEditingChanged: @escaping (Bool) -> Void = { _ in }) {
+    init(value: Binding<V>, in range: ClosedRange<V> = 0...1, step: V.Stride? = nil, onEditingChanged: @escaping (Bool) -> Void = { _ in }) {
         self.value = value
 
         if let step = step {
             self.step = step
             var newUpperbound = range.lowerBound
-            while newUpperbound + step <= range.upperBound{
-                newUpperbound += step
+            while newUpperbound.advanced(by: step) <= range.upperBound{
+                newUpperbound = newUpperbound.advanced(by: step)
             }
             self.range = ClosedRange(uncheckedBounds: (range.lowerBound, newUpperbound))
         } else {
@@ -75,7 +75,7 @@ extension VSlider {
     private func getPoint(in geometry: GeometryProxy) -> CGPoint {
         let x = geometry.size.width / 2
         let location = value.wrappedValue - range.lowerBound
-        let scale = Double(2 * drawRadius - geometry.size.height) / (range.upperBound - range.lowerBound)
+        let scale = V(2 * drawRadius - geometry.size.height) / (range.upperBound - range.lowerBound)
         let y = CGFloat(location * scale) + geometry.size.height - drawRadius
         return CGPoint(x: x, y: y)
     }
@@ -90,10 +90,11 @@ extension VSlider {
             if self.validDrag {
                 let location = drag.location.y - geometry.size.height + self.drawRadius
                 let scale = CGFloat(self.range.upperBound - self.range.lowerBound) / (2 * self.drawRadius - geometry.size.height)
-                let newValue = Double(location * scale) + self.range.lowerBound
+                let newValue = V(location * scale) + self.range.lowerBound
                 let clampedValue = max(min(newValue, self.range.upperBound), self.range.lowerBound)
 
-                if let step = self.step {
+                if self.step != nil {
+                    let step = V.zero.advanced(by: self.step!)
                     self.value.wrappedValue = round((clampedValue - self.range.lowerBound) / step) * step + self.range.lowerBound
                 } else {
                     self.value.wrappedValue = clampedValue
