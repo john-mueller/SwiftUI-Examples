@@ -10,7 +10,7 @@ class FlowLayoutModel: ObservableObject {
         }
     }
     // Derived data storage used to layout view on multiple lines
-    // This is really only @Published to guarentee display after first reflow
+    // This is really only @Published to guarantee display after first reflow
     @Published var flowedWords: [[String]] = []
 
     // Containers to store words array and widths of word views
@@ -20,7 +20,7 @@ class FlowLayoutModel: ObservableObject {
     // Spacing between word views
     let spacing: CGFloat = 10
 
-    // This splits initial string into array and poplates widths array ahead of first layout
+    // This splits initial string into array and populates widths array ahead of first layout
     init(string: String) {
         self.string = string
         words = string.components(separatedBy: .whitespaces).filter { !$0.isEmpty }
@@ -39,7 +39,7 @@ extension FlowLayoutModel {
             widths = preferences.sorted(by: \.index).map { $0.width.rounded(.up) }
             self.widths = widths
         } else {
-            // If top level view with changed, use saved word view widths
+            // If top level view width changed, use saved word view widths
             widths = self.widths
         }
 
