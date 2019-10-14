@@ -54,6 +54,7 @@ struct VSliderDemo: View {
                     }
                 }
             }
+            .frame(height: 300)
 
         }.padding()
     }
