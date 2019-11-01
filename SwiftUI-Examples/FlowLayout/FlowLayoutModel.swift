@@ -16,38 +16,30 @@ class FlowLayoutModel: ObservableObject {
     // Containers to store words array and widths of word views
     var words: [String] = []
     var widths: [CGFloat] = []
+    var viewWidth: CGFloat = 0
 
     // Spacing between word views
     let spacing: CGFloat = 10
 
-    // This splits initial string into array and populates widths array ahead of first layout
     init(string: String) {
         self.string = string
-        words = string.components(separatedBy: .whitespaces).filter { !$0.isEmpty }
-        widths = Array(repeating: 0, count: words.count)
     }
 }
 
 extension FlowLayoutModel {
-    func reflow(in geometry: GeometryProxy, with preferences: [ViewWidth]? = nil) {
-
+    func reflow() {
         guard words.count > 0 else { flowedWords = []; return }
 
-        let widths: [CGFloat]
-        if let preferences = preferences {
-            // If number or length of word views changed, use and store new word view widths
-            widths = preferences.sorted(by: \.index).map { $0.width.rounded(.up) }
-            self.widths = widths
-        } else {
-            // If top level view width changed, use saved word view widths
-            widths = self.widths
+        guard self.widths.count > 0 else {
+            flowedWords = [words]
+            return
         }
 
         // Get indices of words array where we need to break to stay in top level view width
         var breakIndices: [Int] = []
-        var lineWidth: CGFloat = widths[0]
-        for (index, width) in widths.dropFirst().enumerated() {
-            if lineWidth + width + spacing < geometry.size.width {
+        var lineWidth: CGFloat = self.widths[0]
+        for (index, width) in self.widths.dropFirst().enumerated() {
+            if lineWidth + width + spacing < viewWidth {
                 lineWidth += width + spacing
             } else {
                 breakIndices.append(index + 1) // + 1 because of the .dropFirst() above

@@ -2,7 +2,8 @@ import SwiftUI
 
 struct FlowLayoutDemo: View {
     @ObservedObject var model = FlowLayoutModel(string: .gettysburgShort)
-    @State private var padding: CGFloat = 0
+    @State private var inset: CGFloat = 0
+    private var padding: CGFloat = 10
 
     var body: some View {
         VStack {
@@ -19,13 +20,14 @@ struct FlowLayoutDemo: View {
                 .padding(5).overlay(Capsule().stroke(Color.blue))
             }
             // Slider changes width of FlowLayout view
-            Slider(value: $padding, in: 0...100, step: 1)
+            Slider(value: $inset, in: 0...100, step: 1)
             HStack(spacing: 0) {
-                Rectangle().fill(Color.blue.opacity(0.3)).frame(width: padding)
+                Rectangle().fill(Color.blue.opacity(0.3)).frame(width: inset)
                 FlowLayout(model: model)
-                Rectangle().fill(Color.blue.opacity(0.3)).frame(width: padding)
+                Rectangle().fill(Color.blue.opacity(0.3)).frame(width: inset)
             }
+            .frame(minWidth: 0, maxWidth: UIScreen.main.bounds.width - 2 * padding)
         }
-        .padding()
+        .padding(padding)
     }
 }
